@@ -1,9 +1,12 @@
 const express = require("express");
-const faker = require("faker");
+var cors = require("cors");
+const { router: productRouter } = require("./routers");
 
 const app = express();
 
 const port = process.env.PORT || 8000;
+
+app.use("/products", productRouter);
 
 app.get("/", (req, res) => {
   res.send("RStore API");
