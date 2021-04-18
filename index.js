@@ -1,6 +1,8 @@
 const express = require("express");
 var cors = require("cors");
-const { router: productRouter } = require("./routers");
+const { router: productRouter } = require("./routes");
+
+const db = require("./config/mongoose");
 
 const app = express();
 
