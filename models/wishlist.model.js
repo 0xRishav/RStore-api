@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
-const Wishlist = new Schema(
+const wishlistSchema = new Schema(
   {
     by: {
       type: mongoose.Schema.Types.ObjectId,
@@ -15,6 +15,6 @@ const Wishlist = new Schema(
   }
 );
 
-const Wishlist = mongoose.model("Wishlist", Wishlist);
+const Wishlist = mongoose.model("Wishlist", wishlistSchema);
 
 module.exports = Wishlist;
