@@ -17,6 +17,14 @@ const userSchema = new Schema(
       type: String,
       required: [true, "password can't be empty"],
     },
+    wishlist: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "Wishlist",
+    },
+    cart: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "Cart",
+    },
   },
   {
     timestamps: true,
