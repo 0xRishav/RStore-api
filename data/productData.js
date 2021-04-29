@@ -1,8 +1,5 @@
 const productData = [
-  // **************************************MOBILES******************************************************
-  // APPLE
   {
-    id: 1,
     name: "Apple iPhone 11 (64GB) - Black",
     brand: "Apple",
     category: "Mobiles",
@@ -42,7 +39,6 @@ const productData = [
   },
 
   {
-    id: 2,
     name: "Apple iPhone 12 Pro Max (128GB) - Pacific Blue",
     brand: "Apple",
     category: "Mobiles",
@@ -76,7 +72,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 3,
     name: "Apple iPhone 12 (64GB) - Blue",
     brand: "Apple",
     category: "Mobiles",
@@ -111,7 +106,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 4,
     name: "iPhone 11 Pro Max (256GB) - Space Grey",
     brand: "Apple",
     category: "Mobiles",
@@ -150,7 +144,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 5,
     name: "Apple iPhone XR 64GB - Black",
     brand: "Apple",
     category: "Mobiles",
@@ -188,10 +181,7 @@ const productData = [
     rating: 4.5,
     isInStock: true,
   },
-
-  // OnePlus
   {
-    id: 6,
     name: "OnePlus 8T 5G (Aquamarine Green, 8GB RAM, 128GB Storage)",
     brand: "OnePlus",
     category: "Mobiles",
@@ -227,7 +217,6 @@ const productData = [
   },
 
   {
-    id: 7,
     name: "OnePlus Nord 5G (Gray Onyx, 12GB RAM, 256GB Storage)",
     brand: "OnePlus",
     category: "Mobiles",
@@ -264,7 +253,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 8,
     name: "OnePlus 5 (Slate Gray 6GB RAM + 64GB memory)",
     brand: "OnePlus",
     category: "Mobiles",
@@ -301,7 +289,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 9,
     name: "OnePlus Nord 5G (Blue Marble, 12GB RAM, 256GB Storage)",
     brand: "OnePlus",
     category: "Mobiles",
@@ -336,7 +323,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 10,
     name: "OnePlus 7 Pro (Nebula Blue, 8GB RAM, 256GB Storage)",
     brand: "OnePlus",
     category: "Mobiles",
@@ -370,10 +356,7 @@ const productData = [
     rating: 4.5,
     isInStock: true,
   },
-
-  // Samsung
   {
-    id: 11,
     name:
       "Samsung Galaxy S20 + (Cosmic Gray, 8GB RAM, 128GB Storage) Without Offer",
     brand: "Samsung",
@@ -408,7 +391,6 @@ const productData = [
   },
 
   {
-    id: 12,
     name: "Samsung Galaxy S20 FE (Cloud Lavender, 8GB RAM, 128GB Storage)",
     brand: "Samsung",
     category: "Mobiles",
@@ -439,7 +421,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 13,
     name: "Samsung Galaxy S21 5G (Phantom Gray, 8GB, 128GB Storage)",
     brand: "Samsung",
     category: "Mobiles",
@@ -472,7 +453,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 14,
     name: "Samsung Galaxy Z Fold2 5G Mystic Bronze, 12GB RAM, 256GB Storage",
     brand: "Samsung",
     category: "Mobiles",
@@ -509,7 +489,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 15,
     name: "Samsung Galaxy M31s (Mirage Blue, 8GB RAM, 128GB Storage)",
     brand: "Samsung",
     category: "Mobiles",
@@ -545,11 +524,7 @@ const productData = [
     rating: 4.5,
     isInStock: true,
   },
-
-  // MI
-
   {
-    id: 16,
     name: "Mi 10i 5G (Midnight Black, 8GB RAM, 128GB Storage)",
     brand: "Mi",
     category: "Mobiles",
@@ -583,7 +558,6 @@ const productData = [
   },
 
   {
-    id: 17,
     name: "Redmi Note 9 (Arctic White, 4GB RAM, 64GB Storage)",
     brand: "Mi",
     category: "Mobiles",
@@ -614,7 +588,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 18,
     name: "Mi 10T Pro 5G (Cosmic Black, 8GB RAM, 128GB Storage)",
     brand: "Mi",
     category: "Mobiles",
@@ -649,7 +622,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 19,
     name:
       "Mi 10 (Coral Green, 8GB RAM, 256GB Storage) - 108MP Quad Camera, SD 865 Processor, 5G Ready",
     brand: "Mi",
@@ -687,7 +659,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 20,
     name: "Redmi Note 10 Pro Max (Vintage Bronze, 6GB RAM, 128GB Storage)",
     brand: "Mi",
     category: "Mobiles",
@@ -721,11 +692,7 @@ const productData = [
     rating: 4.5,
     isInStock: true,
   },
-
-  // *************************************    TV     *****************************************************
-  // OnePlus
   {
-    id: 21,
     name:
       "OnePlus Y Series 80 cm (32 inches) HD Ready LED Smart Android TV 32Y1 (Black)",
     brand: "OnePlus",
@@ -759,7 +726,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 22,
     name:
       "OnePlus Y Series 108 cm (43 inches) Full HD LED Smart Android TV 43Y1 (Black)",
     brand: "OnePlus",
@@ -795,7 +761,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 23,
     name:
       "OnePlus 138.8 cm (55 inches) Q1 Series 4K Certified Android QLED TV 55Q1IN Pro (Black)",
     brand: "OnePlus",
@@ -831,7 +796,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 24,
     name:
       "OnePlus U Series 138.8 cm (55 inches) 55U1 Series 4K Ultra HD LED Smart Android TV 55UA0A01 (Black)",
     brand: "OnePlus",
@@ -864,10 +828,7 @@ const productData = [
     rating: 4.0,
     isInStock: true,
   },
-
-  // MI
   {
-    id: 25,
     name: "Mi TV 4A PRO 80 cm (32 inches) HD Ready Android LED TV (Black)",
     brand: "MI",
     category: "TV",
@@ -898,7 +859,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 26,
     name: "Mi TV 4A PRO 108 cm (43 Inches) Full HD Android LED TV (Black)",
     brand: "MI",
     category: "TV",
@@ -931,7 +891,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 27,
     name: "Mi TV 4X 125.7 cm (50 Inches) 4K Ultra HD Android LED TV (Black)",
     brand: "MI",
     category: "TV",
@@ -964,7 +923,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 28,
     name: "Mi TV 4X 138.8 cm (55 Inches) Ultra HD Android LED TV (Black)",
     brand: "MI",
     category: "TV",
@@ -999,7 +957,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 29,
     name:
       "MI TV 4A Horizon Edition 108cm (43 inches) Full HD Android LED TV (Black)",
     brand: "MI",
@@ -1034,10 +991,7 @@ const productData = [
     rating: 4.5,
     isInStock: true,
   },
-
-  // Realme
   {
-    id: 30,
     name: "Realme 108 cm (43 Inches) Full HD Smart TV",
     brand: "Realme",
     category: "TV",
@@ -1069,10 +1023,7 @@ const productData = [
     rating: 5,
     isInStock: true,
   },
-
-  // LG
   {
-    id: 31,
     name: "LG 108 cm (43 inches) 4K Ultra HD Smart LED TV",
     brand: "LG",
     category: "TV",
@@ -1105,7 +1056,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 32,
     name:
       "LG 80 cm (32 inches) HD Ready Smart LED TV 32LM563BPTC (Dark Iron Gray)",
     brand: "LG",
@@ -1139,7 +1089,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 33,
     name:
       "LG 108 cm (43 inches) Full HD LED Smart TV 43LM5650PTA (Ceramic Black)",
     brand: "LG",
@@ -1173,7 +1122,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 34,
     name:
       "LG 139 cm (55 inches) 4K UHD Smart LED TV 55UM7290PTD (Ceramic BK + Dark Steel Silver)",
     brand: "LG",
@@ -1207,7 +1155,6 @@ const productData = [
     isInStock: true,
   },
   {
-    id: 35,
     name: "LG 139 cm (55 inches) 4K Ultra HD Smart LED TV 55SK8500PTA (Black)",
     brand: "LG",
     category: "TV",
@@ -1241,12 +1188,7 @@ const productData = [
     rating: 4.0,
     isInStock: true,
   },
-
-  // ********************   LAPTOPS   **********************
-  // HP
-
   {
-    id: 36,
     name: "HP Spectre x360 13-ap0121TU 2019 13.3-inch Full HD Laptop",
     brand: "HP",
     category: "Laptop",
@@ -1280,7 +1222,6 @@ const productData = [
   },
 
   {
-    id: 37,
     name: "Apple MacBook Pro",
     brand: "Apple",
     category: "Laptop",
@@ -1308,11 +1249,7 @@ const productData = [
     rating: 4,
     isInStock: true,
   },
-
-  // ******************* Watch *******************
-  // Apple
   {
-    id: 38,
     name: "Apple Watch Series 6",
     brand: "Apple",
     category: "Watch",
@@ -1346,7 +1283,6 @@ const productData = [
   },
 
   {
-    id: 39,
     name: "Apple Watch SE",
     brand: "Apple",
     category: "Watch",
@@ -1380,7 +1316,6 @@ const productData = [
   },
 
   {
-    id: 40,
     name: "Apple Watch Series 3",
     brand: "Apple",
     category: "Watch",
@@ -1414,7 +1349,6 @@ const productData = [
   },
 
   {
-    id: 41,
     name: "Samsung Galaxy Watch",
     brand: "Samsung",
     category: "Watch",
@@ -1444,7 +1378,6 @@ const productData = [
   },
 
   {
-    id: 42,
     name: "Samsung Galaxy Watch Active 2",
     brand: "Samsung",
     category: "Watch",
@@ -1478,7 +1411,6 @@ const productData = [
   },
 
   {
-    id: 43,
     name: "Noise Colorfit Pro 2 Full Touch Control Smart Watch",
     brand: "Noise",
     category: "Watch",
@@ -1510,7 +1442,6 @@ const productData = [
   },
 
   {
-    id: 44,
     name: "Realme Fashion Watch",
     brand: "Realme",
     category: "Watch",
@@ -1542,7 +1473,6 @@ const productData = [
   },
 
   {
-    id: 45,
     name: '"Realme Watch S 1.3" Large"',
     brand: "Realme",
     category: "Watch",
@@ -1574,7 +1504,6 @@ const productData = [
   },
 
   {
-    id: 46,
     name: '"Realme Watch S Pro 1.4" Large"',
     brand: "Realme",
     category: "Watch",
