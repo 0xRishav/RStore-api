@@ -11,6 +11,7 @@ const userSchema = new Schema(
     },
     email: {
       type: mongoose.SchemaTypes.Email,
+      unique: true,
       required: [true, "email is required"],
     },
     password: {
@@ -18,11 +19,11 @@ const userSchema = new Schema(
       required: [true, "password can't be empty"],
     },
     wishlist: {
-      type: mongoose.SchemaTypes.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Wishlist",
     },
     cart: {
-      type: mongoose.SchemaTypes.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Cart",
     },
   },
