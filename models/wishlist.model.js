@@ -4,15 +4,18 @@ const { Schema } = mongoose;
 
 const wishlistSchema = new Schema(
   {
+    wishlistItems: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "product",
+      },
+    ],
     by: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
-    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 const Wishlist = mongoose.model("Wishlist", wishlistSchema);
