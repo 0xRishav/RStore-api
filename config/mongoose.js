@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const uri =
-  "mongodb+srv://rishavbharti:Gm1581ddnagar@rproducts-cluster.myi3p.mongodb.net/inventory?retryWrites=true&w=majority";
+  "mongodb+srv://rishavbharti:Gm1581ddnagar@rproducts-cluster.myi3p.mongodb.net/RStore?retryWrites=true&w=majority";
 
 mongoose
   .connect(uri, {
