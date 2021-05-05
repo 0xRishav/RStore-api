@@ -56,6 +56,7 @@ module.exports.signInUser = async (req, res) => {
           return res.status(200).json({
             success: true,
             message: "Sign In successfull",
+            user
           });
         } else {
           return res.status(401).json({
