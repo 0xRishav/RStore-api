@@ -1,6 +1,5 @@
 const userdb = require("../models/user.model");
 const wishlistdb = require("../models/wishlist.model");
-const productsdb = require("../models/product.model");
 
 module.exports.addToWishlist = async (req, res) => {
   const { id } = req.params;
@@ -26,7 +25,7 @@ module.exports.addToWishlist = async (req, res) => {
     const newUser = await userdb.findById(id);
     const data = await (
       await wishlistdb.findById(newUser.wishlist)
-    ).execPopulate({ path: "wishlistItems", populate: { path: "product" } });
+    ).execPopulate({ path: "wishlistItems", populate: { path: "products" } });
 
     return res.status(201).json({
       success: true,
@@ -58,7 +57,7 @@ module.exports.removeFromWishlist = async (req, res) => {
     const newUser = await userdb.findById(id);
     const data = await (
       await wishlistdb.findById(newUser.wishlist)
-    ).execPopulate({ path: "wishlistItems", populate: { path: "product" } });
+    ).execPopulate({ path: "wishlistItems", populate: { path: "products" } });
 
     return res.status(201).json({
       success: true,
@@ -82,7 +81,7 @@ module.exports.getAllwishlistItems = async (req, res) => {
     if (wishlist) {
       const data = await (
         await wishlistdb.findById(user.wishlist)
-      ).execPopulate({ path: "wishlistItems", populate: { path: "product" } });
+      ).execPopulate({ path: "wishlistItems", populate: { path: "products" } });
       return res.status(201).json({
         ok: true,
         data: [...data.wishlistItems],
