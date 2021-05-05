@@ -31,7 +31,7 @@ module.exports.addToCart = async (req, res) => {
     const newUser = await userdb.findById(id);
     const data = await (await cartdb.findById(newUser.cart)).execPopulate({
       path: "cartItems",
-      populate: { path: "product" },
+      populate: { path: "products" },
     });
     return res.status(201).json({
       success: true,
@@ -42,14 +42,13 @@ module.exports.addToCart = async (req, res) => {
     console.log(error);
     return res.status(503).json({
       success: false,
-      message: "Internal error",
+      message: "Internal server error",
     });
   }
 };
 
 module.exports.removeFromCart = async (req, res) => {
-  const { id } = req.params;
-  const { productId } = req.body;
+  const { id, productId } = req.params;
   try {
     const user = await userdb.findById(id);
     const cart = await cartdb.findById(user.cart);
@@ -63,7 +62,7 @@ module.exports.removeFromCart = async (req, res) => {
     }
     const data = await (await cartdb.findById(user.cart)).execPopulate({
       path: "cartItems",
-      populate: { path: "product" },
+      populate: { path: "products" },
     });
     return res.status(201).json({
       success: true,
@@ -74,7 +73,7 @@ module.exports.removeFromCart = async (req, res) => {
     console.log(error);
     return res.status(503).json({
       success: false,
-      message: "Internal error",
+      message: "internal server error",
     });
   }
 };
@@ -97,7 +96,7 @@ module.exports.changeQuantity = async (req, res) => {
       await cart.save();
       const data = await (await cartdb.findById(user.cart)).execPopulate({
         path: "cartItems",
-        populate: { path: "product" },
+        populate: { path: "products" },
       });
       return res.status(201).json({
         success: true,
@@ -114,7 +113,7 @@ module.exports.changeQuantity = async (req, res) => {
     console.log(error);
     return res.status(503).json({
       success: false,
-      message: "Internal error",
+      message: "internal server error",
     });
   }
 };
@@ -127,7 +126,7 @@ module.exports.getAllCartItems = async (req, res) => {
     if (cart) {
       const data = await await cart.execPopulate({
         path: "cartItems",
-        populate: { path: "product" },
+        populate: { path: "products" },
       });
       return res.status(200).json({
         success: true,
@@ -145,7 +144,7 @@ module.exports.getAllCartItems = async (req, res) => {
     console.log(error);
     return res.status(503).json({
       success: false,
-      message: "Internal error",
+      message: "internal server error",
     });
   }
 };
