@@ -28,6 +28,10 @@ const productSchema = new Schema(
       type: Number,
       required: [true, "rating is required"],
     },
+    isInStock: {
+      type: Boolean,
+      required: [true, "isInStoke is required"],
+    },
     fastDelivery: {
       type: Boolean,
       requird: [true, "fastDelivery is required"],
