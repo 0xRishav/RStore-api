@@ -31,7 +31,7 @@ module.exports.addToCart = async (req, res) => {
     const newUser = await userdb.findById(id);
     const data = await (await cartdb.findById(newUser.cart)).execPopulate({
       path: "cartItems",
-      populate: { path: "products" },
+      populate: { path: "product" },
     });
     return res.status(201).json({
       success: true,
@@ -62,7 +62,7 @@ module.exports.removeFromCart = async (req, res) => {
     }
     const data = await (await cartdb.findById(user.cart)).execPopulate({
       path: "cartItems",
-      populate: { path: "products" },
+      populate: { path: "product" },
     });
     return res.status(201).json({
       success: true,
@@ -96,7 +96,7 @@ module.exports.changeQuantity = async (req, res) => {
       await cart.save();
       const data = await (await cartdb.findById(user.cart)).execPopulate({
         path: "cartItems",
-        populate: { path: "products" },
+        populate: { path: "product" },
       });
       return res.status(201).json({
         success: true,
@@ -124,9 +124,9 @@ module.exports.getAllCartItems = async (req, res) => {
     const user = await userdb.findById(id);
     const cart = await cartdb.findById(user.cart);
     if (cart) {
-      const data = await await cart.execPopulate({
+      const data = await cart.execPopulate({
         path: "cartItems",
-        populate: { path: "products" },
+        populate: { path: "product" },
       });
       return res.status(200).json({
         success: true,
