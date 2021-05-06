@@ -6,13 +6,13 @@ const wishlistSchema = new Schema(
   {
     wishlistItems: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Product",
       },
     ],
     by: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   { timestamps: true }

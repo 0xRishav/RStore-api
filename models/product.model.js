@@ -13,11 +13,11 @@ const productSchema = new Schema(
       required: [true, "brand is required"],
     },
     image: {
-      type: mongoose.Schema.Types.Array,
+      type: Schema.Types.Array,
       required: [true, "image is required"],
     },
     about: {
-      type: mongoose.Schema.Types.Array,
+      type: Schema.Types.Array,
       required: [true, "about is required"],
     },
     price: {

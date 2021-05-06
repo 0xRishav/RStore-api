@@ -19,11 +19,11 @@ const userSchema = new Schema(
       required: [true, "password can't be empty"],
     },
     wishlist: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Wishlist",
     },
     cart: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Cart",
     },
   },
