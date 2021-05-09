@@ -10,10 +10,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "faker": "^5.5.3",
     "mongoose": "^5.12.4",
+    "mongoose-type-email": "^1.1.2",
     "nodemon": "^2.0.7"
   },
   "engines": {
