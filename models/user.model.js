@@ -7,16 +7,16 @@ const userSchema = new Schema(
   {
     name: {
       type: String,
-      required: [true, "name is required"],
+      required: ["name is required"],
     },
     email: {
       type: mongoose.SchemaTypes.Email,
       unique: true,
-      required: [true, "email is required"],
+      required: ["email is required"],
     },
     password: {
       type: String,
-      required: [true, "password can't be empty"],
+      required: ["password can't be empty"],
     },
     wishlist: {
       type: Schema.Types.ObjectId,
