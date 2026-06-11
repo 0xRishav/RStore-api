@@ -45,7 +45,7 @@ app.use(
 app.use(morgan("combined"));
 app.use(limiter);
 
-app.use("/", router);
+app.use("/api", router);
 
 app.get("/", (req, res) => {
   res.send("RStore API");

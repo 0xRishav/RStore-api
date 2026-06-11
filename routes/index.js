@@ -6,14 +6,14 @@ const checkoutService = require("../services/checkout.service");
 const { validateSignup, validateSignin } = require("../validators/auth.validator");
 const { validateAddToCart, validateChangeQuantity } = require("../validators/cart.validator");
 
-const userController = require("../controllers/user.controller");
+const authController = require("../controllers/auth.controller");
 const productController = require("../controllers/product.controller");
 const cartController = require("../controllers/cart.controller");
 const wishlistController = require("../controllers/wishlist.controller");
 
-// User routes
-router.post("/users/signup", validateSignup, userController.signUpUser);
-router.post("/users/signin", validateSignin, userController.signInUser);
+// Auth routes
+router.post("/auth/signup", validateSignup, authController.signUp);
+router.post("/auth/signin", validateSignin, authController.signIn);
 
 // Product routes
 router.get("/products", productController.getAllProducts);
