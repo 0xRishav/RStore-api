@@ -10,6 +10,7 @@ const router = require("./routes");
 const db = require("./config/mongoose");
 const errorHandler = require("./middleware/errorHandler");
 
+const morgan = require("morgan");
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -34,6 +35,7 @@ app.use(
   })
 );
 
+app.use(morgan("combined"));
 app.use(limiter);
 
 app.use("/", router);
