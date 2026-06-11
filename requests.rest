@@ -1,66 +1,70 @@
+@baseUrl = http://localhost:9000/api
+@token = <signin-first>
+@productId = <replace-with-real-id>
+
 ### Health
-GET http://localhost:9000/api/health
+GET {{baseUrl}}/health
 
 ### Signup
-POST http://localhost:9000/api/auth/signup
+POST {{baseUrl}}/auth/signup
 Content-Type: application/json
 
 {"name": "Alice", "email": "alice@test.com", "password": "secret123"}
 
 ### Signin
-POST http://localhost:9000/api/auth/signin
+POST {{baseUrl}}/auth/signin
 Content-Type: application/json
 
 {"email": "alice@test.com", "password": "secret123"}
 
-### Get all products
-GET http://localhost:9000/api/products
+### Products
+GET {{baseUrl}}/products
 
-### Get product by ID
-GET http://localhost:9000/api/products/PRODUCT_ID_HERE
+### Product by ID
+GET {{baseUrl}}/products/{{productId}}
 
-### Get cart (requires token)
-GET http://localhost:9000/api/cart
-Authorization: Bearer TOKEN_HERE
+### Cart
+GET {{baseUrl}}/cart
+Authorization: Bearer {{token}}
 
-### Get cart total
-GET http://localhost:9000/api/cart/total
-Authorization: Bearer TOKEN_HERE
+### Cart total
+GET {{baseUrl}}/cart/total
+Authorization: Bearer {{token}}
 
 ### Add to cart
-POST http://localhost:9000/api/cart
+POST {{baseUrl}}/cart
 Content-Type: application/json
-Authorization: Bearer TOKEN_HERE
+Authorization: Bearer {{token}}
 
-{"productId": "PRODUCT_ID_HERE"}
+{"productId": "{{productId}}"}
 
 ### Remove from cart
-DELETE http://localhost:9000/api/cart/products/PRODUCT_ID_HERE
-Authorization: Bearer TOKEN_HERE
+DELETE {{baseUrl}}/cart/products/{{productId}}
+Authorization: Bearer {{token}}
 
 ### Change cart quantity
-PUT http://localhost:9000/api/cart/products/PRODUCT_ID_HERE
+PUT {{baseUrl}}/cart/products/{{productId}}
 Content-Type: application/json
-Authorization: Bearer TOKEN_HERE
+Authorization: Bearer {{token}}
 
 {"quantity": 3}
 
-### Get wishlist
-GET http://localhost:9000/api/wishlist
-Authorization: Bearer TOKEN_HERE
+### Wishlist
+GET {{baseUrl}}/wishlist
+Authorization: Bearer {{token}}
 
 ### Add to wishlist
-POST http://localhost:9000/api/wishlist
+POST {{baseUrl}}/wishlist
 Content-Type: application/json
-Authorization: Bearer TOKEN_HERE
+Authorization: Bearer {{token}}
 
-{"productId": "PRODUCT_ID_HERE"}
+{"productId": "{{productId}}"}
 
 ### Remove from wishlist
-DELETE http://localhost:9000/api/wishlist/products/PRODUCT_ID_HERE
-Authorization: Bearer TOKEN_HERE
+DELETE {{baseUrl}}/wishlist/products/{{productId}}
+Authorization: Bearer {{token}}
 
-### Create order (checkout)
-POST http://localhost:9000/api/checkout
+### Checkout
+POST {{baseUrl}}/checkout
 Content-Type: application/json
-Authorization: Bearer TOKEN_HERE
+Authorization: Bearer {{token}}
