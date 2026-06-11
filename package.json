@@ -10,7 +10,7 @@
     "format": "prettier --write .",
     "test": "node --check index.js"
   },
-  "author": "",
+  "author": "Rishav Bharti",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
