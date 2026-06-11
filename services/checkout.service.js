@@ -8,7 +8,7 @@ try {
     key_id: process.env.RAZORPAY_KEY,
     key_secret: process.env.RAZORPAY_SECRET,
   });
-} catch (e) {
+} catch {
   console.log("Razorpay init failed. Check RAZORPAY_KEY/RAZORPAY_SECRET env vars.");
 }
 
