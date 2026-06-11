@@ -35,6 +35,16 @@ app.get("/", (req, res) => {
 
 app.use(errorHandler);
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`express server is running at http://localhost:${port}`);
+});
+
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received. Shutting down gracefully...");
+  server.close(() => db.close(false).then(() => process.exit(0)));
+});
+
+process.on("SIGINT", () => {
+  console.log("SIGINT received. Shutting down gracefully...");
+  server.close(() => db.close(false).then(() => process.exit(0)));
 });
