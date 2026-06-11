@@ -20,33 +20,19 @@ router.get("/products", productController.getAllProducts);
 router.get("/products/:productId", productController.getProductById);
 
 // Cart router
-router.get("/cart/:id", auth, cartController.getAllCartItems);
-router.post("/cart/:id", auth, validateAddToCart, cartController.addToCart);
-router.delete(
-  "/cart/:id/products/:productId",
-  auth,
-  cartController.removeFromCart
-);
-router.put(
-  "/cart/:id/products/:productId",
-  auth,
-  validateChangeQuantity,
-  cartController.changeQuantity
-);
+router.get("/cart", auth, cartController.getAllCartItems);
+router.post("/cart", auth, validateAddToCart, cartController.addToCart);
+router.delete("/cart/products/:productId", auth, cartController.removeFromCart);
+router.put("/cart/products/:productId", auth, validateChangeQuantity, cartController.changeQuantity);
 
 // Wishlist router
-router.post("/wishlist/:id", auth, wishlistController.addToWishlist);
-router.delete(
-  "/wishlist/:id/products/:productId",
-  auth,
-  wishlistController.removeFromWishlist
-);
-router.get("/wishlist/:id", auth, wishlistController.getAllwishlistItems);
+router.get("/wishlist", auth, wishlistController.getAllwishlistItems);
+router.post("/wishlist", auth, wishlistController.addToWishlist);
+router.delete("/wishlist/products/:productId", auth, wishlistController.removeFromWishlist);
 
 // Checkout
 router.post("/checkout", auth, asyncHandler(async (req, res) => {
-  const userId = req.body.userId || req.user._id;
-  const data = await checkoutService.createOrder(userId);
+  const data = await checkoutService.createOrder(req.user._id);
   res.json({ success: true, data, message: "Order created" });
 }));
 
