@@ -62,9 +62,10 @@ async function changeQuantity(userId, productId, quantity) {
     throw new AppError("Invalid request", 400);
   }
 
-  await cart.updateOne({ $pull: { cartItems: { product: productId } } });
-  cart.cartItems.push({ product: productId, quantity });
-  await cart.save();
+  await Cart.updateOne(
+    { _id: cart._id, "cartItems.product": productId },
+    { $set: { "cartItems.$.quantity": quantity } }
+  );
 
   const updatedCart = await Cart.findById(user.cart);
   const items = await populateCart(updatedCart);
