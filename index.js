@@ -19,9 +19,14 @@ const limiter = rateLimit({
 });
 
 const app = express();
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
 const port = process.env.PORT || 9000;
 
-app.use(helmet());
+app.use(helmet({
+  hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
 app.use(compression());
 app.use(
   cors({
