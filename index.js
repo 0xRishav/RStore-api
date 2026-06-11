@@ -11,6 +11,7 @@ const db = require("./config/mongoose");
 const errorHandler = require("./middleware/errorHandler");
 
 const morgan = require("morgan");
+const compression = require("compression");
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -21,6 +22,7 @@ const app = express();
 const port = process.env.PORT || 9000;
 
 app.use(helmet());
+app.use(compression());
 app.use(
   cors({
     origin: process.env.CLIENT_ORIGIN || "*",
