@@ -2,15 +2,20 @@
 
 const isDefiningProjection = require('./isDefiningProjection');
 
-/*!
+/**
  * Determines if `path` is excluded by `projection`
  *
- * @param {Object} projection
+ * @param {object} projection
  * @param {string} path
- * @return {Boolean}
+ * @return {boolean}
+ * @api private
  */
 
 module.exports = function isPathExcluded(projection, path) {
+  if (projection == null) {
+    return false;
+  }
+
   if (path === '_id') {
     return projection._id === 0;
   }

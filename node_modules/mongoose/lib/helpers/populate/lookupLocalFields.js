@@ -10,7 +10,17 @@ module.exports = function lookupLocalFields(cur, path, val) {
   }
 
   if (arguments.length >= 3) {
-    cur[path] = val;
+    if (typeof cur !== 'object') {
+      return void 0;
+    }
+    if (val === void 0) {
+      return void 0;
+    }
+    if (cur instanceof Map) {
+      cur.set(path, val);
+    } else {
+      cur[path] = val;
+    }
     return val;
   }
 
@@ -21,5 +31,10 @@ module.exports = function lookupLocalFields(cur, path, val) {
       Array.from(cur.values()) :
       Object.keys(cur).map(key => cur[key]);
   }
+
+  if (cur instanceof Map) {
+    return cur.get(path);
+  }
+
   return cur[path];
 };

@@ -1,27 +1,28 @@
 'use strict';
 
-/*!
-* returns discriminator by discriminatorMapping.value
-*
-* @param {Model} model
-* @param {string} value
-*/
+const areDiscriminatorValuesEqual = require('./areDiscriminatorValuesEqual');
 
-module.exports = function getDiscriminatorByValue(model, value) {
-  let discriminator = null;
-  if (!model.discriminators) {
-    return discriminator;
+/**
+ * returns discriminator by discriminatorMapping.value
+ *
+ * @param {object} discriminators
+ * @param {string} value
+ * @api private
+ */
+
+module.exports = function getDiscriminatorByValue(discriminators, value) {
+  if (discriminators == null) {
+    return null;
   }
-  for (const name in model.discriminators) {
-    const it = model.discriminators[name];
+  for (const name of Object.keys(discriminators)) {
+    const it = discriminators[name];
     if (
       it.schema &&
       it.schema.discriminatorMapping &&
-      it.schema.discriminatorMapping.value == value
+      areDiscriminatorValuesEqual(it.schema.discriminatorMapping.value, value)
     ) {
-      discriminator = it;
-      break;
+      return it;
     }
   }
-  return discriminator;
+  return null;
 };

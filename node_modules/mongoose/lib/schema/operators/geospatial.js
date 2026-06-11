@@ -25,7 +25,7 @@ function cast$near(val) {
 
   _castMinMaxDistance(this, val);
 
-  if (val && val.$geometry) {
+  if (val?.$geometry) {
     return cast$geometry(val, this);
   }
 
@@ -34,7 +34,7 @@ function cast$near(val) {
       'with a $geometry property');
   }
 
-  return SchemaArray.prototype.castForQuery.call(this, val);
+  return SchemaArray.prototype.castForQuery.call(this, null, val);
 }
 
 function cast$geometry(val, self) {

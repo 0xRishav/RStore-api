@@ -7,23 +7,28 @@
 const MongooseCollection = require('../../collection');
 const MongooseError = require('../../error/mongooseError');
 const Collection = require('mongodb').Collection;
-const get = require('../../helpers/get');
-const sliced = require('sliced');
+const ObjectId = require('../../types/objectid');
+const getConstructorName = require('../../helpers/getConstructorName');
+const internalToObjectOptions = require('../../options').internalToObjectOptions;
 const stream = require('stream');
 const util = require('util');
+
+const formatToObjectOptions = Object.freeze({ ...internalToObjectOptions, copyTrustedSymbol: false });
 
 /**
  * A [node-mongodb-native](https://github.com/mongodb/node-mongodb-native) collection implementation.
  *
  * All methods methods from the [node-mongodb-native](https://github.com/mongodb/node-mongodb-native) driver are copied and wrapped in queue management.
  *
- * @inherits Collection
+ * @inherits Collection https://mongodb.github.io/node-mongodb-native/7.0/classes/Collection.html
  * @api private
  */
 
-function NativeCollection(name, options) {
+function NativeCollection(name, conn, options) {
   this.collection = null;
   this.Promise = options.Promise || Promise;
+  this.modelName = options.modelName;
+  delete options.modelName;
   this._closed = false;
   MongooseCollection.apply(this, arguments);
 }
@@ -32,7 +37,7 @@ function NativeCollection(name, options) {
  * Inherit from abstract Collection.
  */
 
-NativeCollection.prototype.__proto__ = MongooseCollection.prototype;
+Object.setPrototypeOf(NativeCollection.prototype, MongooseCollection.prototype);
 
 /**
  * Called when the connection opens.
@@ -41,64 +46,9 @@ NativeCollection.prototype.__proto__ = MongooseCollection.prototype;
  */
 
 NativeCollection.prototype.onOpen = function() {
-  const _this = this;
-
-  // always get a new collection in case the user changed host:port
-  // of parent db instance when re-opening the connection.
-
-  if (!_this.opts.capped.size) {
-    // non-capped
-    callback(null, _this.conn.db.collection(_this.name));
-    return _this.collection;
-  }
-
-  if (_this.opts.autoCreate === false) {
-    _this.collection = _this.conn.db.collection(_this.name);
-    MongooseCollection.prototype.onOpen.call(_this);
-    return _this.collection;
-  }
-
-  // capped
-  return _this.conn.db.collection(_this.name, function(err, c) {
-    if (err) return callback(err);
-
-    // discover if this collection exists and if it is capped
-    _this.conn.db.listCollections({ name: _this.name }).toArray(function(err, docs) {
-      if (err) {
-        return callback(err);
-      }
-      const doc = docs[0];
-      const exists = !!doc;
-
-      if (exists) {
-        if (doc.options && doc.options.capped) {
-          callback(null, c);
-        } else {
-          const msg = 'A non-capped collection exists with the name: ' + _this.name + '\n\n'
-              + ' To use this collection as a capped collection, please '
-              + 'first convert it.\n'
-              + ' http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-Convertingacollectiontocapped';
-          err = new Error(msg);
-          callback(err);
-        }
-      } else {
-        // create
-        const opts = Object.assign({}, _this.opts.capped);
-        opts.capped = true;
-        _this.conn.db.createCollection(_this.name, opts, callback);
-      }
-    });
-  });
-
-  function callback(err, collection) {
-    if (err) {
-      // likely a strict mode error
-      _this.conn.emit('error', err);
-    } else {
-      _this.collection = collection;
-      MongooseCollection.prototype.onOpen.call(_this);
-    }
-  }
+  this.collection = this.conn.db.collection(this.name);
+  MongooseCollection.prototype.onOpen.call(this);
+  return this.collection;
 };
 
 /**
@@ -111,29 +61,45 @@ NativeCollection.prototype.onClose = function(force) {
   MongooseCollection.prototype.onClose.call(this, force);
 };
 
-/*!
- * ignore
+/**
+ * Helper to get the collection, in case `this.collection` isn't set yet.
+ * May happen if `bufferCommands` is false and created the model when
+ * Mongoose was disconnected.
+ *
+ * @api private
  */
 
-const syncCollectionMethods = { watch: true };
+NativeCollection.prototype._getCollection = function _getCollection() {
+  if (this.collection) {
+    return this.collection;
+  }
+  if (this.conn.db != null) {
+    this.collection = this.conn.db.collection(this.name);
+    return this.collection;
+  }
+  return null;
+};
 
-/*!
+/**
  * Copy the collection methods and make them subject to queues
+ * @param {number|string} I
+ * @api private
  */
 
 function iter(i) {
   NativeCollection.prototype[i] = function() {
-    const collection = this.collection;
-    const args = Array.from(arguments);
+    const collection = this._getCollection();
+    const args = arguments;
     const _this = this;
-    const debug = get(_this, 'conn.base.options.debug');
-    const lastArg = arguments[arguments.length - 1];
+    const globalDebug = _this?.conn?.base?.options?.debug;
+    const connectionDebug = _this?.conn?.options?.debug;
+    const debug = connectionDebug == null ? globalDebug : connectionDebug;
 
     // If user force closed, queueing will hang forever. See #5664
     if (this.conn.$wasForceClosed) {
       const error = new MongooseError('Connection was force closed');
       if (args.length > 0 &&
-          typeof args[args.length - 1] === 'function') {
+        typeof args[args.length - 1] === 'function') {
         args[args.length - 1](error);
         return;
       } else {
@@ -141,70 +107,81 @@ function iter(i) {
       }
     }
 
+    // Lazily generate opId and argsArray only if necessary because they have
+    // a non-trivial performance cost.
+    let opId = null;
+    let argsArray = null;
+    const hasOperationListeners = this.conn.listenerCount('operation-start') > 0 || this.conn.listenerCount('operation-end') > 0;
+    if (hasOperationListeners || debug) {
+      opId = new ObjectId();
+    }
+
+    let timeout = null;
+    let waitForBufferPromise = null;
     if (this._shouldBufferCommands() && this.buffer) {
-      if (syncCollectionMethods[i]) {
-        throw new Error('Collection method ' + i + ' is synchronous');
+      if (opId == null) {
+        opId = new ObjectId();
       }
-
-      this.conn.emit('buffer', { method: i, args: args });
-
-      let callback;
-      let _args;
-      let promise = null;
-      let timeout = null;
-      if (typeof lastArg === 'function') {
-        callback = function collectionOperationCallback() {
-          if (timeout != null) {
-            clearTimeout(timeout);
-          }
-          return lastArg.apply(this, arguments);
-        };
-        _args = args.slice(0, args.length - 1).concat([callback]);
-      } else {
-        promise = new this.Promise((resolve, reject) => {
-          callback = function collectionOperationCallback(err, res) {
-            if (timeout != null) {
-              clearTimeout(timeout);
-            }
-            if (err != null) {
-              return reject(err);
-            }
-            resolve(res);
-          };
-          _args = args.concat([callback]);
-          this.addQueue(i, _args);
-        });
-      }
+      this.conn.emit('buffer', {
+        _id: opId,
+        modelName: _this.modelName,
+        collectionName: _this.name,
+        method: i,
+        args: args
+      });
 
       const bufferTimeoutMS = this._getBufferTimeoutMS();
-      timeout = setTimeout(() => {
-        const removed = this.removeQueue(i, _args);
-        if (removed) {
-          const message = 'Operation `' + this.name + '.' + i + '()` buffering timed out after ' +
-            bufferTimeoutMS + 'ms';
-          callback(new MongooseError(message));
+      waitForBufferPromise = new Promise((resolve, reject) => {
+        this.addQueue(resolve);
+
+        timeout = setTimeout(() => {
+          const removed = this.removeQueue(resolve);
+          if (removed) {
+            const message = 'Operation `' + this.name + '.' + i + '()` buffering timed out after ' +
+              bufferTimeoutMS + 'ms';
+            const err = new MongooseError(message);
+            this.conn.emit('buffer-end', { _id: opId, modelName: _this.modelName, collectionName: _this.name, method: i, error: err });
+            reject(err);
+          }
+        }, bufferTimeoutMS);
+      });
+
+      return waitForBufferPromise.then(() => {
+        if (timeout) {
+          clearTimeout(timeout);
         }
-      }, bufferTimeoutMS);
-
-      if (typeof lastArg === 'function') {
-        this.addQueue(i, _args);
-        return;
-      }
-
-      return promise;
+        return this[i].apply(this, args);
+      });
     }
 
     if (debug) {
       if (typeof debug === 'function') {
+        if (argsArray == null) {
+          argsArray = Array.from(args);
+        }
+        let argsToAdd = null;
+        if (typeof argsArray[argsArray.length - 1] == 'function') {
+          argsToAdd = argsArray.slice(0, argsArray.length - 1);
+        } else {
+          argsToAdd = argsArray;
+        }
         debug.apply(_this,
-          [_this.name, i].concat(sliced(args, 0, args.length - 1)));
+          [_this.name, i].concat(argsToAdd));
       } else if (debug instanceof stream.Writable) {
         this.$printToStream(_this.name, i, args, debug);
       } else {
         const color = debug.color == null ? true : debug.color;
         const shell = debug.shell == null ? false : debug.shell;
-        this.$print(_this.name, i, args, color, shell);
+        const timestamp = debug.timestamp == null ? false : debug.timestamp;
+        this.$print(_this.name, i, args, color, shell, timestamp);
       }
+    }
+
+    if (hasOperationListeners) {
+      if (argsArray == null) {
+        argsArray = Array.from(args);
+      }
+      this.conn.emit('operation-start', { _id: opId, modelName: _this.modelName, collectionName: this.name, method: i, params: argsArray });
     }
 
     try {
@@ -215,21 +192,50 @@ function iter(i) {
         throw new MongooseError(message);
       }
 
-      return collection[i].apply(collection, args);
-    } catch (error) {
-      // Collection operation may throw because of max bson size, catch it here
-      // See gh-3906
-      if (args.length > 0 &&
-          typeof args[args.length - 1] === 'function') {
-        args[args.length - 1](error);
-      } else {
-        throw error;
+      const ret = collection[i].apply(collection, args);
+      if (typeof ret?.then === 'function') {
+        return ret.then(
+          result => {
+            if (timeout != null) {
+              clearTimeout(timeout);
+            }
+            if (hasOperationListeners) {
+              this.conn.emit('operation-end', { _id: opId, modelName: _this.modelName, collectionName: this.name, method: i, result });
+            }
+            return result;
+          },
+          error => {
+            if (timeout != null) {
+              clearTimeout(timeout);
+            }
+            if (hasOperationListeners) {
+              this.conn.emit('operation-end', { _id: opId, modelName: _this.modelName, collectionName: this.name, method: i, error });
+            }
+            throw error;
+          }
+        );
       }
+
+      if (hasOperationListeners) {
+        this.conn.emit('operation-end', { _id: opId, modelName: _this.modelName, collectionName: this.name, method: i, result: ret });
+      }
+      if (timeout != null) {
+        clearTimeout(timeout);
+      }
+      return ret;
+    } catch (error) {
+      if (timeout != null) {
+        clearTimeout(timeout);
+      }
+      if (hasOperationListeners) {
+        this.conn.emit('operation-end', { _id: opId, modelName: _this.modelName, collectionName: this.name, method: i, error: error });
+      }
+      throw error;
     }
   };
 }
 
-for (const key of Object.keys(Collection.prototype)) {
+for (const key of Object.getOwnPropertyNames(Collection.prototype)) {
   // Janky hack to work around gh-3005 until we can get rid of the mongoose
   // collection abstraction
   const descriptor = Object.getOwnPropertyDescriptor(Collection.prototype, key);
@@ -251,7 +257,12 @@ for (const key of Object.keys(Collection.prototype)) {
  * @method $print
  */
 
-NativeCollection.prototype.$print = function(name, i, args, color, shell) {
+NativeCollection.prototype.$print = function(name, i, args, color, shell, timestamp) {
+  let prefix = '';
+  if (timestamp) {
+    const ts = new Date().toISOString();
+    prefix = color ? `\x1B[0;90m[${ts}]\x1B[0m ` : `[${ts}] `;
+  }
   const moduleName = color ? '\x1B[0;36mMongoose:\x1B[0m ' : 'Mongoose: ';
   const functionCall = [name, i].join('.');
   const _args = [];
@@ -262,14 +273,14 @@ NativeCollection.prototype.$print = function(name, i, args, color, shell) {
   }
   const params = '(' + _args.join(', ') + ')';
 
-  console.info(moduleName + functionCall + params);
+  console.info(prefix + moduleName + functionCall + params);
 };
 
 /**
  * Debug print helper
  *
  * @api public
- * @method $print
+ * @method $printToStream
  */
 
 NativeCollection.prototype.$printToStream = function(name, i, args, stream) {
@@ -298,8 +309,10 @@ NativeCollection.prototype.$format = function(arg, color, shell) {
   return format(arg, false, color, shell);
 };
 
-/*!
+/**
  * Debug print helper
+ * @param {any} representation
+ * @api private
  */
 
 function inspectable(representation) {
@@ -325,7 +338,7 @@ function formatDate(x, key, shell) {
   }
 }
 function format(obj, sub, color, shell) {
-  if (obj && typeof obj.toBSON === 'function') {
+  if (typeof obj?.toBSON === 'function') {
     obj = obj.toBSON();
   }
   if (obj == null) {
@@ -333,15 +346,18 @@ function format(obj, sub, color, shell) {
   }
 
   const clone = require('../../helpers/clone');
-  let x = clone(obj, { transform: false });
+  // `sub` indicates `format()` was called recursively, so skip cloning because we already
+  // did a deep clone on the top-level object.
+  let x = sub ? obj : clone(obj, formatToObjectOptions);
+  const constructorName = getConstructorName(x);
 
-  if (x.constructor.name === 'Binary') {
+  if (constructorName === 'Binary') {
     x = 'BinData(' + x.sub_type + ', "' + x.toString('base64') + '")';
-  } else if (x.constructor.name === 'ObjectID') {
+  } else if (constructorName === 'ObjectId') {
     x = inspectable('ObjectId("' + x.toHexString() + '")');
-  } else if (x.constructor.name === 'Date') {
+  } else if (constructorName === 'Date') {
     x = inspectable('new Date("' + x.toUTCString() + '")');
-  } else if (x.constructor.name === 'Object') {
+  } else if (constructorName === 'Object') {
     const keys = Object.keys(x);
     const numKeys = keys.length;
     let key;
@@ -360,18 +376,19 @@ function format(obj, sub, color, shell) {
             error = _error;
           }
         }
-        if (x[key].constructor.name === 'Binary') {
+        const _constructorName = getConstructorName(x[key]);
+        if (_constructorName === 'Binary') {
           x[key] = 'BinData(' + x[key].sub_type + ', "' +
             x[key].buffer.toString('base64') + '")';
-        } else if (x[key].constructor.name === 'Object') {
+        } else if (_constructorName === 'Object') {
           x[key] = format(x[key], true);
-        } else if (x[key].constructor.name === 'ObjectID') {
+        } else if (_constructorName === 'ObjectId') {
           formatObjectId(x, key);
-        } else if (x[key].constructor.name === 'Date') {
+        } else if (_constructorName === 'Date') {
           formatDate(x, key, shell);
-        } else if (x[key].constructor.name === 'ClientSession') {
+        } else if (_constructorName === 'ClientSession') {
           x[key] = inspectable('ClientSession("' +
-            get(x[key], 'id.id.buffer', '').toString('hex') + '")');
+            (x[key]?.id?.id?.buffer || '').toString('hex') + '")');
         } else if (Array.isArray(x[key])) {
           x[key] = x[key].map(map);
         } else if (error != null) {
@@ -396,7 +413,6 @@ function format(obj, sub, color, shell) {
 /**
  * Retrieves information about this collections indexes.
  *
- * @param {Function} callback
  * @method getIndexes
  * @api public
  */

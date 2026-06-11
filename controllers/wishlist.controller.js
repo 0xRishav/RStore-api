@@ -6,30 +6,28 @@ module.exports.addToWishlist = async (req, res) => {
   const { productId } = req.body;
   try {
     const user = await userdb.findById(id);
-    const wishlist = await wishlistdb.findById(user.wishlist);
+    let wishlist = await wishlistdb.findById(user.wishlist);
     if (wishlist) {
       if (!wishlist.wishlistItems.some((product) => product == productId)) {
         wishlist.wishlistItems.push(productId);
         await wishlist.save();
       }
     } else {
-      const newWishlist = await wishlistdb.create({
+      wishlist = await wishlistdb.create({
         by: id,
       });
-      await user.update({
-        wishlist: newWishlist._id,
-      });
-      await newWishlist.wishlistItems.push(productId);
-      await newWishlist.save();
+      user.wishlist = wishlist._id;
+      await user.save();
+      wishlist.wishlistItems.push(productId);
+      await wishlist.save();
     }
-    const newUser = await userdb.findById(id);
-    const data = await (
-      await wishlistdb.findById(newUser.wishlist)
-    ).execPopulate({ path: "wishlistItems", populate: { path: "products" } });
-
+    const populatedWishlist = await wishlist.populate({
+      path: "wishlistItems",
+      populate: { path: "products" },
+    });
     return res.status(201).json({
       success: true,
-      data: [...data.wishlistItems],
+      data: [...populatedWishlist.wishlistItems],
       message: "Product added to wishlist",
     });
   } catch (error) {
@@ -47,21 +45,20 @@ module.exports.removeFromWishlist = async (req, res) => {
     const user = await userdb.findById(id);
     const wishlist = await wishlistdb.findById(user.wishlist);
     if (wishlist.wishlistItems.some((product) => product == productId)) {
-      await wishlist.update({ $pull: { wishlistItems: productId } });
+      await wishlist.updateOne({ $pull: { wishlistItems: productId } });
     } else {
       return res.status(400).json({
         success: false,
-        messafe: "Invalid request",
+        message: "Invalid request",
       });
     }
-    const newUser = await userdb.findById(id);
-    const data = await (
-      await wishlistdb.findById(newUser.wishlist)
-    ).execPopulate({ path: "wishlistItems", populate: { path: "products" } });
-
+    const populatedWishlist = await wishlistdb.findById(user.wishlist).populate({
+      path: "wishlistItems",
+      populate: { path: "products" },
+    });
     return res.status(201).json({
       success: true,
-      data: [...data.wishlistItems],
+      data: [...populatedWishlist.wishlistItems],
       message: "Product removed from wishlist",
     });
   } catch (error) {
@@ -77,11 +74,18 @@ module.exports.getAllwishlistItems = async (req, res) => {
   const { id } = req.params;
   try {
     const user = await userdb.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        ok: false,
+        message: "User not found",
+      });
+    }
     const wishlist = await wishlistdb.findById(user.wishlist);
     if (wishlist) {
-      const data = await (
-        await wishlistdb.findById(user.wishlist)
-      ).execPopulate({ path: "wishlistItems", populate: { path: "products" } });
+      const data = await wishlist.populate({
+        path: "wishlistItems",
+        populate: { path: "products" },
+      });
       return res.status(201).json({
         ok: true,
         data: [...data.wishlistItems],

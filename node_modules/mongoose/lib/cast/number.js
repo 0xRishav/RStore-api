@@ -1,14 +1,11 @@
 'use strict';
 
-const assert = require('assert');
-
-/*!
- * Given a value, cast it to a number, or throw a `CastError` if the value
+/**
+ * Given a value, cast it to a number, or throw an `Error` if the value
  * cannot be casted. `null` and `undefined` are considered valid.
  *
- * @param {Any} value
- * @param {String} [path] optional the path to set on the CastError
- * @return {Boolean|null|undefined}
+ * @param {any} value
+ * @return {number}
  * @throws {Error} if `value` is not one of the allowed values
  * @api private
  */
@@ -25,7 +22,9 @@ module.exports = function castNumber(val) {
     val = Number(val);
   }
 
-  assert.ok(!isNaN(val));
+  if (isNaN(val)) {
+    throw new Error('Cast to Number failed: value is not a valid number');
+  }
   if (val instanceof Number) {
     return val.valueOf();
   }
@@ -39,5 +38,5 @@ module.exports = function castNumber(val) {
     return Number(val);
   }
 
-  assert.ok(false);
+  throw new Error('Cast to Number failed: value is not a valid number');
 };

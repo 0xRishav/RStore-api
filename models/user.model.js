@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-require("mongoose-type-email");
+const validator = require("validator");
 
 const { Schema } = mongoose;
 
@@ -7,16 +7,20 @@ const userSchema = new Schema(
   {
     name: {
       type: String,
-      required: ["name is required"],
+      required: [true, "name is required"],
     },
     email: {
-      type: mongoose.SchemaTypes.Email,
+      type: String,
       unique: true,
-      required: ["email is required"],
+      required: [true, "email is required"],
+      validate: {
+        validator: (v) => validator.isEmail(v),
+        message: "Invalid email address",
+      },
     },
     password: {
       type: String,
-      required: ["password can't be empty"],
+      required: [true, "password can't be empty"],
     },
     wishlist: {
       type: Schema.Types.ObjectId,

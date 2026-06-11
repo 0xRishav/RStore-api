@@ -34,11 +34,11 @@ const productSchema = new Schema(
     },
     fastDelivery: {
       type: Boolean,
-      requird: [true, "fastDelivery is required"],
+      required: [true, "fastDelivery is required"],
     },
     freeShipping: {
       type: Boolean,
-      requird: [true, "freeShipping is required"],
+      required: [true, "freeShipping is required"],
     },
   },
   {
