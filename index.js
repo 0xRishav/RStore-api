@@ -5,9 +5,16 @@ validateEnv();
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const router = require("./routes");
 const db = require("./config/mongoose");
 const errorHandler = require("./middleware/errorHandler");
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { success: false, message: "Too many requests, please try again later" },
+});
 
 const app = express();
 const port = process.env.PORT || 9000;
@@ -26,6 +33,8 @@ app.use(
     extended: true,
   })
 );
+
+app.use(limiter);
 
 app.use("/", router);
 
