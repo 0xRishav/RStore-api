@@ -1,9 +1,66 @@
-POST http://localhost:3000/
+### Health
+GET http://localhost:9000/api/health
 
+### Signup
+POST http://localhost:9000/api/auth/signup
 Content-Type: application/json
 
-{
-    "name": "new",
-    "email": "w@w.com",
-    "password": "123456"
-}
+{"name": "Alice", "email": "alice@test.com", "password": "secret123"}
+
+### Signin
+POST http://localhost:9000/api/auth/signin
+Content-Type: application/json
+
+{"email": "alice@test.com", "password": "secret123"}
+
+### Get all products
+GET http://localhost:9000/api/products
+
+### Get product by ID
+GET http://localhost:9000/api/products/PRODUCT_ID_HERE
+
+### Get cart (requires token)
+GET http://localhost:9000/api/cart
+Authorization: Bearer TOKEN_HERE
+
+### Get cart total
+GET http://localhost:9000/api/cart/total
+Authorization: Bearer TOKEN_HERE
+
+### Add to cart
+POST http://localhost:9000/api/cart
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{"productId": "PRODUCT_ID_HERE"}
+
+### Remove from cart
+DELETE http://localhost:9000/api/cart/products/PRODUCT_ID_HERE
+Authorization: Bearer TOKEN_HERE
+
+### Change cart quantity
+PUT http://localhost:9000/api/cart/products/PRODUCT_ID_HERE
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{"quantity": 3}
+
+### Get wishlist
+GET http://localhost:9000/api/wishlist
+Authorization: Bearer TOKEN_HERE
+
+### Add to wishlist
+POST http://localhost:9000/api/wishlist
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{"productId": "PRODUCT_ID_HERE"}
+
+### Remove from wishlist
+DELETE http://localhost:9000/api/wishlist/products/PRODUCT_ID_HERE
+Authorization: Bearer TOKEN_HERE
+
+### Create order (checkout)
+POST http://localhost:9000/api/checkout
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
