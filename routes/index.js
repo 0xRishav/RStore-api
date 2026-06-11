@@ -46,12 +46,12 @@ router.get("/wishlist/:id", auth, wishlistController.getAllwishlistItems);
 // Checkout
 router.post("/checkout", auth, asyncHandler(async (req, res) => {
   const userId = req.body.userId || req.user._id;
-  const order = await checkoutService.createOrder(userId);
-  res.json(order);
+  const data = await checkoutService.createOrder(userId);
+  res.json({ success: true, data, message: "Order created" });
 }));
 
 router.get("/health", (req, res) =>
-  res.json({ success: true, message: "working" })
+  res.json({ success: true, message: "Server is running" })
 );
 
 module.exports = router;
