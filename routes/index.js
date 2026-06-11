@@ -20,6 +20,7 @@ router.get("/products", productController.getAllProducts);
 router.get("/products/:productId", productController.getProductById);
 
 // Cart router
+router.get("/cart/total", auth, cartController.getCartTotal);
 router.get("/cart", auth, cartController.getAllCartItems);
 router.post("/cart", auth, validateAddToCart, cartController.addToCart);
 router.delete("/cart/products/:productId", auth, cartController.removeFromCart);

@@ -20,3 +20,8 @@ exports.getAllCartItems = asyncHandler(async (req, res) => {
   const data = await cartService.getAllCartItems(req.user._id);
   return res.status(200).json({ success: true, data, message: "Cart items retrieved" });
 });
+
+exports.getCartTotal = asyncHandler(async (req, res) => {
+  const data = await cartService.getCartTotal(req.user._id);
+  return res.status(200).json({ success: true, data, message: "Cart total calculated" });
+});
