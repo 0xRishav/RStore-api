@@ -1,5 +1,5 @@
-const asyncHandler = require("../utils/asyncHandler");
-const productService = require("../services/productService");
+const asyncHandler = require("../utils/async-handler.util");
+const productService = require("../services/product.service");
 
 exports.getAllProducts = asyncHandler(async (req, res) => {
   const data = await productService.getAllProducts();

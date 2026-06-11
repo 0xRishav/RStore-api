@@ -1,6 +1,6 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
-const AppError = require("../utils/AppError");
+const AppError = require("../utils/app-error.util");
 
 const JWT_SECRET = process.env.JWT_SECRET || "rstore-jwt-secret-dev";
 

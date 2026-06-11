@@ -1,5 +1,5 @@
-const asyncHandler = require("../utils/asyncHandler");
-const cartService = require("../services/cartService");
+const asyncHandler = require("../utils/async-handler.util");
+const cartService = require("../services/cart.service");
 
 exports.addToCart = asyncHandler(async (req, res) => {
   const data = await cartService.addToCart(req.user._id, req.body.productId);

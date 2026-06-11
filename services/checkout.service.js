@@ -1,6 +1,6 @@
 const Razorpay = require("razorpay");
-const AppError = require("../utils/AppError");
-const cartService = require("./cartService");
+const AppError = require("../utils/app-error.util");
+const cartService = require("./cart.service");
 
 let razorpay;
 try {

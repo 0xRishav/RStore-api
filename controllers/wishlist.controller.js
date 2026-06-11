@@ -1,5 +1,5 @@
-const asyncHandler = require("../utils/asyncHandler");
-const wishlistService = require("../services/wishlistService");
+const asyncHandler = require("../utils/async-handler.util");
+const wishlistService = require("../services/wishlist.service");
 
 exports.addToWishlist = asyncHandler(async (req, res) => {
   const data = await wishlistService.addToWishlist(req.user._id, req.body.productId);

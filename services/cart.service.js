@@ -1,6 +1,6 @@
 const Cart = require("../models/cart.model");
 const User = require("../models/user.model");
-const AppError = require("../utils/AppError");
+const AppError = require("../utils/app-error.util");
 
 async function getUserCart(userId) {
   const user = await User.findById(userId);

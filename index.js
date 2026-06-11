@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { validateEnv } = require("./config/env");
+const { validateEnv } = require("./config/env.config");
 validateEnv();
 
 const express = require("express");
@@ -7,8 +7,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const router = require("./routes");
-const db = require("./config/mongoose");
-const errorHandler = require("./middleware/errorHandler");
+const db = require("./config/mongoose.config");
+const errorHandler = require("./middleware/error-handler.middleware");
 
 const morgan = require("morgan");
 const compression = require("compression");

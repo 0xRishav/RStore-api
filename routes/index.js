@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth");
-const asyncHandler = require("../utils/asyncHandler");
-const checkoutService = require("../services/checkoutService");
-const { validateSignup, validateSignin } = require("../validators/auth");
-const { validateAddToCart, validateChangeQuantity } = require("../validators/cart");
+const auth = require("../middleware/auth.middleware");
+const asyncHandler = require("../utils/async-handler.util");
+const checkoutService = require("../services/checkout.service");
+const { validateSignup, validateSignin } = require("../validators/auth.validator");
+const { validateAddToCart, validateChangeQuantity } = require("../validators/cart.validator");
 
-const userController = require("../controllers/User.controller");
-const productController = require("../controllers/Product.controller");
-const cartController = require("../controllers/Cart.controller");
+const userController = require("../controllers/user.controller");
+const productController = require("../controllers/product.controller");
+const cartController = require("../controllers/cart.controller");
 const wishlistController = require("../controllers/wishlist.controller");
 
 // User routes

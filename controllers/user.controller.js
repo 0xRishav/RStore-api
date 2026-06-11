@@ -1,5 +1,5 @@
-const asyncHandler = require("../utils/asyncHandler");
-const authService = require("../services/authService");
+const asyncHandler = require("../utils/async-handler.util");
+const authService = require("../services/auth.service");
 
 exports.signUpUser = asyncHandler(async (req, res) => {
   const data = await authService.signup(req.body);

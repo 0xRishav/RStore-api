@@ -1,6 +1,6 @@
 const Wishlist = require("../models/wishlist.model");
 const User = require("../models/user.model");
-const AppError = require("../utils/AppError");
+const AppError = require("../utils/app-error.util");
 
 async function getUserWishlist(userId) {
   const user = await User.findById(userId);
