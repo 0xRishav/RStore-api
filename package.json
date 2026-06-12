@@ -8,6 +8,7 @@
     "dev": "nodemon index.js",
     "lint": "eslint .",
     "format": "prettier --write .",
+    "seed": "node scripts/seed.js",
     "test": "node --check index.js"
   },
   "author": "Rishav Bharti",
