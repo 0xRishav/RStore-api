@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth.middleware");
-const asyncHandler = require("../utils/async-handler.util");
-const checkoutService = require("../services/checkout.service");
 const { validateSignup, validateSignin } = require("../validators/auth.validator");
 const { validateAddToCart, validateChangeQuantity } = require("../validators/cart.validator");
 
@@ -10,6 +8,7 @@ const authController = require("../controllers/auth.controller");
 const productController = require("../controllers/product.controller");
 const cartController = require("../controllers/cart.controller");
 const wishlistController = require("../controllers/wishlist.controller");
+const checkoutController = require("../controllers/checkout.controller");
 
 // Auth routes
 router.post("/auth/signup", validateSignup, authController.signUp);
@@ -32,10 +31,7 @@ router.post("/wishlist", auth, wishlistController.addToWishlist);
 router.delete("/wishlist/products/:productId", auth, wishlistController.removeFromWishlist);
 
 // Checkout
-router.post("/checkout", auth, asyncHandler(async (req, res) => {
-  const data = await checkoutService.createOrder(req.user._id);
-  res.json({ success: true, data, message: "Order created" });
-}));
+router.post("/checkout", auth, checkoutController.createOrder);
 
 router.get("/health", (req, res) =>
   res.json({ success: true, message: "Server is running" })
