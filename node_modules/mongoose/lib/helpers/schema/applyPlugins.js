@@ -6,8 +6,19 @@ module.exports = function applyPlugins(schema, plugins, options, cacheKey) {
   }
   schema[cacheKey] = true;
 
-  if (!options || !options.skipTopLevel) {
+  if (!options?.skipTopLevel) {
+    let pluginTags = null;
     for (const plugin of plugins) {
+      const tags = plugin[1] == null ? null : plugin[1].tags;
+      if (!Array.isArray(tags)) {
+        schema.plugin(plugin[0], plugin[1]);
+        continue;
+      }
+
+      pluginTags = pluginTags || new Set(schema.options.pluginTags || []);
+      if (!tags.find(tag => pluginTags.has(tag))) {
+        continue;
+      }
       schema.plugin(plugin[0], plugin[1]);
     }
   }
@@ -22,7 +33,7 @@ module.exports = function applyPlugins(schema, plugins, options, cacheKey) {
         applyPlugins(type.schema, plugins, options, cacheKey);
 
         // Recompile schema because plugins may have changed it, see gh-7572
-        type.caster.prototype.$__setSchema(type.schema);
+        type.Constructor.prototype.$__setSchema(type.schema);
       }
     }
   }

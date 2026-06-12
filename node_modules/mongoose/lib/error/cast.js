@@ -5,14 +5,13 @@
  */
 
 const MongooseError = require('./mongooseError');
-const get = require('../helpers/get');
 const util = require('util');
 
 /**
  * Casting Error constructor.
  *
- * @param {String} type
- * @param {String} value
+ * @param {string} type
+ * @param {string} value
  * @inherits MongooseError
  * @api private
  */
@@ -21,14 +20,27 @@ class CastError extends MongooseError {
   constructor(type, value, path, reason, schemaType) {
     // If no args, assume we'll `init()` later.
     if (arguments.length > 0) {
-      const stringValue = getStringValue(value);
+      const valueType = getValueType(value);
       const messageFormat = getMessageFormat(schemaType);
-      const msg = formatMessage(null, type, stringValue, path, messageFormat);
+      const msg = formatMessage(null, type, value, path, messageFormat, valueType, reason);
       super(msg);
       this.init(type, value, path, reason, schemaType);
     } else {
       super(formatMessage());
     }
+  }
+
+  toJSON() {
+    return {
+      stringValue: this.stringValue,
+      valueType: this.valueType,
+      kind: this.kind,
+      value: this.value,
+      path: this.path,
+      reason: this.reason,
+      name: this.name,
+      message: this.message
+    };
   }
 
   /*!
@@ -41,11 +53,13 @@ class CastError extends MongooseError {
     this.value = value;
     this.path = path;
     this.reason = reason;
+    this.valueType = getValueType(value);
   }
 
-  /*!
+  /**
    * ignore
    * @param {Readonly<CastError>} other
+   * @api private
    */
   copy(other) {
     this.messageFormat = other.messageFormat;
@@ -55,15 +69,15 @@ class CastError extends MongooseError {
     this.path = other.path;
     this.reason = other.reason;
     this.message = other.message;
+    this.valueType = other.valueType;
   }
 
   /*!
    * ignore
    */
   setModel(model) {
-    this.model = model;
-    this.message = formatMessage(model, this.kind, this.stringValue, this.path,
-      this.messageFormat);
+    this.message = formatMessage(model, this.kind, this.value, this.path,
+      this.messageFormat, this.valueType, this.reason);
   }
 }
 
@@ -80,9 +94,24 @@ function getStringValue(value) {
   return stringValue;
 }
 
+function getValueType(value) {
+  if (value == null) {
+    return '' + value;
+  }
+
+  const t = typeof value;
+  if (t !== 'object') {
+    return t;
+  }
+  if (typeof value.constructor !== 'function') {
+    return t;
+  }
+  return value.constructor.name;
+}
+
 function getMessageFormat(schemaType) {
-  const messageFormat = get(schemaType, 'options.cast', null);
-  if (typeof messageFormat === 'string') {
+  const messageFormat = schemaType?._castErrorMessage || null;
+  if (typeof messageFormat === 'string' || typeof messageFormat === 'function') {
     return messageFormat;
   }
 }
@@ -91,22 +120,40 @@ function getMessageFormat(schemaType) {
  * ignore
  */
 
-function formatMessage(model, kind, stringValue, path, messageFormat) {
-  if (messageFormat != null) {
-    let ret = messageFormat.
-      replace('{KIND}', kind).
-      replace('{VALUE}', stringValue).
-      replace('{PATH}', path);
+function formatMessage(model, kind, value, path, messageFormat, valueType, reason) {
+  if (typeof messageFormat === 'string') {
+    const stringValue = getStringValue(value);
+    let ret = messageFormat
+      .replace('{KIND}', kind)
+      .replace('{VALUE}', stringValue)
+      .replace('{PATH}', path);
+
     if (model != null) {
       ret = ret.replace('{MODEL}', model.modelName);
     }
 
     return ret;
+  } else if (typeof messageFormat === 'function') {
+    return messageFormat(value, path, model, kind);
   } else {
+    const stringValue = getStringValue(value);
+    const valueTypeMsg = valueType ? ' (type ' + valueType + ')' : '';
+
     let ret = 'Cast to ' + kind + ' failed for value ' +
-      stringValue + ' at path "' + path + '"';
+      stringValue + valueTypeMsg + ' at path "' + path + '"';
+
     if (model != null) {
       ret += ' for model "' + model.modelName + '"';
+    }
+
+    if (
+      reason != null &&
+      typeof reason.constructor === 'function' &&
+      reason.constructor.name !== 'AssertionError' &&
+      reason.constructor.name !== 'Error' &&
+      reason.constructor.name !== 'BSONError'
+    ) {
+      ret += ' because of "' + reason.constructor.name + '"';
     }
 
     return ret;

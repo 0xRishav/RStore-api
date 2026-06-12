@@ -1,9 +1,70 @@
-POST http://localhost:3000/
+@baseUrl = http://localhost:9000/api
+@token = <signin-first>
+@productId = <replace-with-real-id>
 
+### Health
+GET {{baseUrl}}/health
+
+### Signup
+POST {{baseUrl}}/auth/signup
 Content-Type: application/json
 
-{
-    "name": "new",
-    "email": "w@w.com",
-    "password": "123456"
-}
+{"name": "Alice", "email": "alice@test.com", "password": "secret123"}
+
+### Signin
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{"email": "alice@test.com", "password": "secret123"}
+
+### Products
+GET {{baseUrl}}/products
+
+### Product by ID
+GET {{baseUrl}}/products/{{productId}}
+
+### Cart
+GET {{baseUrl}}/cart
+Authorization: Bearer {{token}}
+
+### Cart total
+GET {{baseUrl}}/cart/total
+Authorization: Bearer {{token}}
+
+### Add to cart
+POST {{baseUrl}}/cart
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{"productId": "{{productId}}"}
+
+### Remove from cart
+DELETE {{baseUrl}}/cart/products/{{productId}}
+Authorization: Bearer {{token}}
+
+### Change cart quantity
+PUT {{baseUrl}}/cart/products/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{"quantity": 3}
+
+### Wishlist
+GET {{baseUrl}}/wishlist
+Authorization: Bearer {{token}}
+
+### Add to wishlist
+POST {{baseUrl}}/wishlist
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{"productId": "{{productId}}"}
+
+### Remove from wishlist
+DELETE {{baseUrl}}/wishlist/products/{{productId}}
+Authorization: Bearer {{token}}
+
+### Checkout
+POST {{baseUrl}}/checkout
+Content-Type: application/json
+Authorization: Bearer {{token}}

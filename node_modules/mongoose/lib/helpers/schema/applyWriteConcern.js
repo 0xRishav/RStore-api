@@ -1,16 +1,39 @@
 'use strict';
 
-const get = require('../get');
+const utils = require('../../utils');
 
 module.exports = function applyWriteConcern(schema, options) {
-  const writeConcern = get(schema, 'options.writeConcern', {});
-  if (!('w' in options) && writeConcern.w != null) {
-    options.w = writeConcern.w;
+  if (options.writeConcern != null) {
+    return;
   }
-  if (!('j' in options) && writeConcern.j != null) {
-    options.j = writeConcern.j;
+  // Don't apply default write concern to operations in transactions,
+  // because setting write concern on an operation in a transaction is an error
+  // See: https://www.mongodb.com/docs/manual/reference/write-concern/
+  if (options?.session?.transaction) {
+    return;
   }
-  if (!('wtimeout' in options) && writeConcern.wtimeout != null) {
-    options.wtimeout = writeConcern.wtimeout;
+  const writeConcern = schema.options.writeConcern ?? {};
+  if (utils.hasOwnKeys(writeConcern)) {
+    options.writeConcern = {};
+    if (!('w' in options) && writeConcern.w != null) {
+      options.writeConcern.w = writeConcern.w;
+    }
+    if (!('j' in options) && writeConcern.j != null) {
+      options.writeConcern.j = writeConcern.j;
+    }
+    if (!('wtimeout' in options) && writeConcern.wtimeout != null) {
+      options.writeConcern.wtimeout = writeConcern.wtimeout;
+    }
+  }
+  else {
+    if (!('w' in options) && writeConcern.w != null) {
+      options.w = writeConcern.w;
+    }
+    if (!('j' in options) && writeConcern.j != null) {
+      options.j = writeConcern.j;
+    }
+    if (!('wtimeout' in options) && writeConcern.wtimeout != null) {
+      options.wtimeout = writeConcern.wtimeout;
+    }
   }
 };

@@ -12,12 +12,16 @@ const productSchema = new Schema(
       type: String,
       required: [true, "brand is required"],
     },
-    image: {
-      type: Schema.Types.Array,
-      required: [true, "image is required"],
+    images: {
+      type: [String],
+      required: [true, "images is required"],
+    },
+    category: {
+      type: String,
+      required: [true, "category is required"],
     },
     about: {
-      type: Schema.Types.Array,
+      type: [String],
       required: [true, "about is required"],
     },
     price: {
@@ -30,15 +34,15 @@ const productSchema = new Schema(
     },
     isInStock: {
       type: Boolean,
-      required: [true, "isInStoke is required"],
+      default: true,
     },
     fastDelivery: {
       type: Boolean,
-      requird: [true, "fastDelivery is required"],
+      default: false,
     },
     freeShipping: {
       type: Boolean,
-      requird: [true, "freeShipping is required"],
+      default: false,
     },
   },
   {

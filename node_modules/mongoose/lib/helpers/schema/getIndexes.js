@@ -2,10 +2,13 @@
 
 const get = require('../get');
 const helperIsObject = require('../isObject');
+const decorateDiscriminatorIndexOptions = require('../indexes/decorateDiscriminatorIndexOptions');
 
-/*!
+/**
  * Gather all indexes defined in the schema, including single nested,
  * document arrays, and embedded discriminators.
+ * @param {Schema} schema
+ * @api private
  */
 
 module.exports = function getIndexes(schema) {
@@ -36,6 +39,11 @@ module.exports = function getIndexes(schema) {
         continue;
       }
 
+      if (path._duplicateKeyErrorMessage != null) {
+        schema._duplicateKeyErrorMessagesByPath = schema._duplicateKeyErrorMessagesByPath || {};
+        schema._duplicateKeyErrorMessagesByPath[key] = path._duplicateKeyErrorMessage;
+      }
+
       if (path.$isMongooseDocumentArray || path.$isSingleNested) {
         if (get(path, 'options.excludeIndexes') !== true &&
             get(path, 'schemaOptions.excludeIndexes') !== true &&
@@ -59,12 +67,12 @@ module.exports = function getIndexes(schema) {
         }
       }
 
-      const index = path._index || (path.caster && path.caster._index);
+      const index = path._index || (path.embeddedSchemaType && path.embeddedSchemaType._index);
 
-      if (index !== false && index !== null && index !== undefined) {
+      if (index !== false && index != null) {
         const field = {};
         const isObject = helperIsObject(index);
-        const options = isObject ? index : {};
+        const options = isObject ? { ...index } : {};
         const type = typeof index === 'string' ? index :
           isObject ? index.type :
             false;
@@ -75,19 +83,25 @@ module.exports = function getIndexes(schema) {
           field[prefix + key] = 'text';
           delete options.text;
         } else {
-          const isDescendingIndex = Number(index) === -1;
+          let isDescendingIndex = false;
+          if (index === 'descending' || index === 'desc') {
+            isDescendingIndex = true;
+          } else if (index === 'ascending' || index === 'asc') {
+            isDescendingIndex = false;
+          } else {
+            isDescendingIndex = Number(index) === -1;
+          }
+
           field[prefix + key] = isDescendingIndex ? -1 : 1;
         }
 
         delete options.type;
-        if (!('background' in options)) {
-          options.background = true;
-        }
         if (schema.options.autoIndex != null) {
           options._autoIndex = schema.options.autoIndex;
         }
 
-        const indexName = options && options.name;
+        const indexName = options?.name;
+
         if (typeof indexName === 'string') {
           if (indexByName.has(indexName)) {
             Object.assign(indexByName.get(indexName), field);
@@ -108,19 +122,21 @@ module.exports = function getIndexes(schema) {
       fixSubIndexPaths(schema, prefix);
     } else {
       schema._indexes.forEach(function(index) {
-        if (!('background' in index[1])) {
-          index[1].background = true;
-        }
+        const options = index[1];
+        decorateDiscriminatorIndexOptions(schema, options);
       });
       indexes = indexes.concat(schema._indexes);
     }
   }
 
-  /*!
+  /**
    * Checks for indexes added to subdocs using Schema.index().
    * These indexes need their paths prefixed properly.
    *
    * schema._indexes = [ [indexObj, options], [indexObj, options] ..]
+   * @param {Schema} schema
+   * @param {string} prefix
+   * @api private
    */
 
   function fixSubIndexPaths(schema, prefix) {
@@ -140,7 +156,7 @@ module.exports = function getIndexes(schema) {
       }
 
       const newIndexOptions = Object.assign({}, indexOptions);
-      if (indexOptions != null && indexOptions.partialFilterExpression != null) {
+      if (indexOptions?.partialFilterExpression != null) {
         newIndexOptions.partialFilterExpression = {};
         const partialFilterExpression = indexOptions.partialFilterExpression;
         for (const key of Object.keys(partialFilterExpression)) {
